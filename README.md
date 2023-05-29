@@ -4,6 +4,7 @@ Wasm-powered, sandboxed implementation of `exec()` for safely running dynamic Py
 [![lint](https://github.com/jflick58/wasm_exec/actions/workflows/lint.yml/badge.svg)](https://github.com/jflick58/wasm_exec/actions/workflows/lint.yml)
 [![test](https://github.com/jflick58/wasm_exec/actions/workflows/test.yml/badge.svg)](https://github.com/jflick58/wasm_exec/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI version](https://badge.fury.io/py/wasm-exec.svg)](https://badge.fury.io/py/wasm-exec)
 
 ## Install 
 
