@@ -1,11 +1,15 @@
 [tool.poetry]
 name = "wasm-exec"
-version = "0.1.4"
+version = "0.1.5"
 description = "WASM-powered, sandboxed version of `exec()` for running dynamic code."
 authors = ["Justin Flick"]
 license = "MIT"
 readme = "README.md"
 repository = "https://www.github.com/jflick58/wasm_exec"
+packages = [
+    { include = "wasm_exec" },
+]
+include = ["wasm_runtime/*"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
