@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "wasm-exec"
+version = "0.0.1"
+description = "WASM-powered sandboxed version of `exec()` for running dynamic code."
+authors = ["Justin Flick"]
+readme = "README.md"
+packages = [{include = "wasm_exec"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+wasmtime = "^9.0.0"
+requests = "^2.31.0"
+pytest = "^7.3.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
