@@ -66,8 +66,8 @@ def wasm_exec(code: str, use_fuel: bool = False, fuel: int = 400_000_000):
             fuel_consumed = store.fuel_consumed()
 
         return Result(
-            result, mem.size(store), mem.data_len(store), fuel_consumed
-        )  # type: ignore
+            result, mem.size(store), mem.data_len(store), fuel_consumed  # type: ignore
+        )
 
 
 # sys.modules[__name__] = wasm_exec
