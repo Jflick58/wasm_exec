@@ -23,7 +23,7 @@ print(wasm_exec(code).text)
 ## How does this work? 
 
 - Arbitrary Python code is passed to the `wasm_exec` function 
-- A seperate Wasm-based Python interpreter is setup via wasmtime in a chroot jail
+- A seperate Wasm-based Python interpreter is setup via [wasmtime](https://github.com/bytecodealliance/wasmtime-py/tree/main) in a chroot jail
 - The arbitrary code is executed safely inside your isolated intepreter
 
 ## Why? 
