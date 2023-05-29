@@ -39,7 +39,7 @@ I understand any claims of being able to securely execute arbitrary code strings
 ## Implementation Notes
 - I do not claim the jailed Wasm Python intepreter as my original idea. This was inspired by [Simon Willison's Blog](https://til.simonwillison.net/webassembly/python-in-a-wasm-sandbox) on this topic and the linked code provided by [Tim Bart](https://gist.github.com/pims/711549577759ad1341f1a90860f1f3a5)
 - The Wasm Python runtime is redistributed from VMWare Wasm Labs' offering of a [Python Wasm runtime](https://wasmlabs.dev/articles/python-wasm32-wasi/)
-- Workflows and CONTIBUTING.md taken from LangChain.
+- Workflows and CONTRIBUTING.md taken from LangChain.
 - Because it is a seperate intepreter, there are currently some limitations on imports. I am working to test and document these limitations. 
 
 ## Contributing 
