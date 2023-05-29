@@ -35,7 +35,7 @@ lint lint_diff:
 TEST_FILE ?= tests/
 
 test:
-	poetry run pytest --disable-socket --allow-unix-socket $(TEST_FILE)
+	poetry run pytest $(TEST_FILE)
 
 help:
 	@echo '----'
