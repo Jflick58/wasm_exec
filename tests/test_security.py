@@ -43,3 +43,11 @@ def test_wasm_exec_no_module_execution():
     code = "__import__('os').system('ls')"
     with pytest.raises(WASMExecError):
         wasm_exec(code)
+
+def test_wasm_exec_no_rm_rf():
+    code = """
+    import shutil
+    shutil.rmtree('/')
+    """
+    with pytest.raises(WASMExecError):
+        wasm_exec(code)

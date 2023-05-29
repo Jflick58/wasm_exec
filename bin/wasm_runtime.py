@@ -34,5 +34,3 @@ def get_wasm():
         raise WASMInstallError("The sha256 checksum of the downloaded file" \
         "is different from that of the provided checksum")
 
-if __name__ == "__main__":
-    get_wasm()

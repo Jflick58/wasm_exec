@@ -23,7 +23,7 @@ def wasm_exec(code:str, use_fuel:bool=False, fuel:int=400_000_000):
     linker = Linker(Engine(engine_cfg))
     linker.define_wasi()
 
-    python_module = Module.from_file(linker.engine, "python-3.11.3.wasm")
+    python_module = Module.from_file(linker.engine, "bin/python-3.11.3.wasm")
 
     config = WasiConfig()
 
