@@ -407,5 +407,5 @@ testing = ["coverage", "flake8 (==4.0.1)", "pycparser", "pytest", "pytest-flake8
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.9"
-content-hash = "9d8267ac43c392232ff2884fed60eadf6ca609ee8f45f06cb6b08c8ac0013786"
+python-versions = "^3.8"
+content-hash = "614e4a8bce3391b004162577d3ccd3fdd032f23b20b1e2d1f5349c336dbf0411"
