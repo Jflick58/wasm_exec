@@ -37,7 +37,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "dist/*"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
           draft: false
           generateReleaseNotes: true
           tag: v${{ steps.check-version.outputs.version }}
