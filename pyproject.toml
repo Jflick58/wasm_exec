@@ -7,6 +7,7 @@ license = "MIT"
 readme = "README.md"
 repository = "https://www.github.com/jflick58/wasm_exec"
 packages = [{include = "wasm_exec"}]
+include = ["bin/*", "README.md"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
