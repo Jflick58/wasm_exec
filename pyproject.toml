@@ -9,7 +9,7 @@ repository = "https://www.github.com/jflick58/wasm_exec"
 packages = [{include = "wasm_exec"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 wasmtime = "^9.0.0"
 
 [tool.poetry.group.test]
