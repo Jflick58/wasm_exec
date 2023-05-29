@@ -62,6 +62,7 @@ def test_wasm_exec_no_rm_rf():
     with pytest.raises(WASMExecError):
         wasm_exec(code)
 
+
 def test_wasm_exec_dupe_chroot_escape():
     """
     Taken from:

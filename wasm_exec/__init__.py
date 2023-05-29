@@ -23,8 +23,8 @@ def wasm_exec(code: str, use_fuel: bool = False, fuel: int = 400_000_000):
     Python runtime.
 
     This is done by using wasmtime to run Python code in a seperate
-    WASM-based interpreter. The wasmtime code is sandboxed using chroot 
-    for added security. 
+    WASM-based interpreter. The wasmtime code is sandboxed using chroot
+    for added security.
 
     Fuel in wasmtime is a mechanism that allows limiting the number of instructions
     executed during WebAssembly code execution. It helps prevent infinite loops or
