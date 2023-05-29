@@ -18,6 +18,36 @@ class WASMExecError(Exception):
 
 
 def wasm_exec(code: str, use_fuel: bool = False, fuel: int = 400_000_000):
+    """
+    Execute Python code strings using the VMWare Wasm Labs WebAssembly
+    Python runtime.
+
+    This is done by using wasmtime to run Python code in a seperate
+    WASM-based interpreter. The wasmtime code is sandboxed using chroot 
+    for added security. 
+
+    Fuel in wasmtime is a mechanism that allows limiting the number of instructions
+    executed during WebAssembly code execution. It helps prevent infinite loops or
+    excessive computations by setting a maximum amount of fuel that can be consumed.
+    Each instruction executed consumes a certain amount of fuel. Once the consumed
+    fuel reaches the specified limit, execution is halted. The consume_fuel option
+    and fuel parameter in the wasm_exec function enable this feature. The Result
+    object includes the fuel_consumed attribute, indicating how much fuel was consumed
+    during execution.
+
+    Credit to: https://til.simonwillison.net/webassembly/python-in-a-wasm-sandbox
+    for the reference implementation.
+
+    :param code: The WebAssembly code to execute.
+    :type code: str
+    :param use_fuel: Whether to limit the execution by fuel consumption (optional).
+    :type use_fuel: bool
+    :param fuel: The maximum amount of fuel allowed for execution (optional).
+    :type fuel: int
+    :return: The result of the code execution.
+    :rtype: Result
+    :raises WASMExecError: If an error occurs during code execution.
+    """
     engine_cfg = Config()
     engine_cfg.consume_fuel = use_fuel
     engine_cfg.cache = True

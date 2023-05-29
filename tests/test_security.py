@@ -61,3 +61,20 @@ def test_wasm_exec_no_rm_rf():
     """
     with pytest.raises(WASMExecError):
         wasm_exec(code)
+
+def test_wasm_exec_dupe_chroot_escape():
+    """
+    Taken from:
+    https://book.hacktricks.xyz/linux-hardening/privilege-escalation/escaping-from-limited-bash
+    """
+    code = """
+    import os
+    os.mkdir("chroot-dir")
+    os.chroot("chroot-dir")
+    for i in range(1000):
+        os.chdir("..")
+    os.chroot(".")
+    os.system("/bin/bash")
+    """
+    with pytest.raises(WASMExecError):
+        wasm_exec(code)
