@@ -44,5 +44,5 @@ I understand any claims of being able to securely execute arbitrary code strings
 
 ## Contributing 
 
-Contributions VERY welcome! See [here](.github/CONTRIBUTING.md).
+Contributions are VERY welcome! See [here](.github/CONTRIBUTING.md).
 
