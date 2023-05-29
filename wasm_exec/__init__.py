@@ -1,8 +1,8 @@
-from wasmtime import Config, Engine, Linker, Module, Store, WasiConfig
 import os
-import sys
 import tempfile
 from textwrap import dedent
+
+from wasmtime import Config, Engine, Linker, Module, Store, WasiConfig  # type: ignore
 
 
 class Result:
@@ -12,10 +12,12 @@ class Result:
         self.data_len = data_len
         self.fuel_consumed = consumed
 
+
 class WASMExecError(Exception):
     pass
 
-def wasm_exec(code:str, use_fuel:bool=False, fuel:int=400_000_000):
+
+def wasm_exec(code: str, use_fuel: bool = False, fuel: int = 400_000_000):
     engine_cfg = Config()
     engine_cfg.consume_fuel = use_fuel
     engine_cfg.cache = True
@@ -51,7 +53,7 @@ def wasm_exec(code:str, use_fuel:bool=False, fuel:int=400_000_000):
 
         try:
             start(store)
-        except Exception as e:
+        except Exception:
             with open(err_log) as f:
                 raise WASMExecError(f.read())
 
@@ -59,12 +61,11 @@ def wasm_exec(code:str, use_fuel:bool=False, fuel:int=400_000_000):
             result = f.read()
 
         if not use_fuel:
-            fuel_consumed = None 
+            fuel_consumed = None
         else:
             fuel_consumed = store.fuel_consumed()
 
-        return Result(
-            result, mem.size(store), mem.data_len(store), fuel_consumed
-        )
+        return Result(result, mem.size(store), mem.data_len(store), fuel_consumed)
 
-#sys.modules[__name__] = wasm_exec
+
+# sys.modules[__name__] = wasm_exec
