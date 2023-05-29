@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "wasm-exec"
 version = "0.1.1"
-description = "WASM-powered sandboxed version of `exec()` for running dynamic code."
+description = "WASM-powered, sandboxed version of `exec()` for running dynamic code."
 authors = ["Justin Flick"]
 license = "MIT"
 readme = "README.md"
