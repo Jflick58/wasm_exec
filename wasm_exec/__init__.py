@@ -2,22 +2,20 @@ import os
 import tempfile
 from textwrap import dedent
 
-from wasmtime import Config, Engine, Linker, Module, Store, WasiConfig  # type: ignore
+from wasmtime import (  # type: ignore
+    Config,
+    Engine,
+    Linker,
+    Module,
+    Store,
+    WasiConfig,
+)
+
+from .exceptions import WasmExecError
+from .schema import Result
 
 
-class Result:
-    def __init__(self, result, mem_size, data_len, consumed):
-        self.text = result.strip()
-        self.mem_size = mem_size
-        self.data_len = data_len
-        self.fuel_consumed = consumed
-
-
-class WASMExecError(Exception):
-    pass
-
-
-def wasm_exec(code: str, use_fuel: bool = False, fuel: int = 400_000_000):
+class WasmExecutor:
     """
     Execute Python code strings using the VMWare Wasm Labs WebAssembly
     Python runtime.
@@ -38,71 +36,84 @@ def wasm_exec(code: str, use_fuel: bool = False, fuel: int = 400_000_000):
     Credit to: https://til.simonwillison.net/webassembly/python-in-a-wasm-sandbox
     for the reference implementation.
 
-    :param code: The WebAssembly code to execute.
-    :type code: str
     :param use_fuel: Whether to limit the execution by fuel consumption (optional).
     :type use_fuel: bool
     :param fuel: The maximum amount of fuel allowed for execution (optional).
     :type fuel: int
-    :return: The result of the code execution.
-    :rtype: Result
-    :raises WASMExecError: If an error occurs during code execution.
+    :param runtime_path: Path to a Wasm runtime (optional)
+    :type runtime_path: str
     """
-    engine_cfg = Config()
-    engine_cfg.consume_fuel = use_fuel
-    engine_cfg.cache = True
 
-    linker = Linker(Engine(engine_cfg))
-    linker.define_wasi()
+    def __init__(
+        self,
+        use_fuel: bool = False,
+        fuel: int = 400_000_000,
+        runtime_path: str = "",
+    ):
+        self.engine_cfg = Config()
+        self.engine_cfg.consume_fuel = use_fuel
+        self.engine_cfg.cache = True
 
-    runtime_path = runtime_path = os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__), "..", "wasm_runtime", "python-3.11.3.wasm"
-        )
-    )
-    python_module = Module.from_file(linker.engine, runtime_path)
+        self.linker = Linker(Engine(self.engine_cfg))
+        self.linker.define_wasi()
 
-    config = WasiConfig()
+        if not runtime_path:
+            runtime_path = os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__),
+                    "..",
+                    "wasm_runtime",
+                    "python-3.11.3.wasm",
+                )
+            )
+        self.python_module = Module.from_file(self.linker.engine, runtime_path)
 
-    config.argv = ("python", "-c", dedent(code))
-    print(dedent(code))
+        self.config = WasiConfig()
+        self.config.argv = ("python", "-c", "")
 
-    with tempfile.TemporaryDirectory() as chroot:
-        out_log = os.path.join(chroot, "out.log")
-        err_log = os.path.join(chroot, "err.log")
-        config.stdout_file = out_log
-        config.stderr_file = err_log
+        self.use_fuel = use_fuel
+        self.fuel = fuel
 
-        store = Store(linker.engine)
+    def exec(self, code):
+        """
+        Execute code in an isolated Wasm-based Python interpreter
 
-        # Limits how many instructions can be executed:
-        if use_fuel:
-            store.add_fuel(fuel)
-        store.set_wasi(config)
-        instance = linker.instantiate(store, python_module)
+        :param code: The WebAssembly code to execute.
+        :type code: str
+        :return: The result of the code execution.
+        :rtype: Result
+        :raises WasmExecError: If an error occurs during code execution.
+        """
+        self.config.argv = ("python", "-c", dedent(code))
 
-        # _start is the default wasi main function
-        start = instance.exports(store)["_start"]
+        with tempfile.TemporaryDirectory() as chroot:
+            out_log = os.path.join(chroot, "out.log")
+            err_log = os.path.join(chroot, "err.log")
+            self.config.stdout_file = out_log
+            self.config.stderr_file = err_log
 
-        mem = instance.exports(store)["memory"]
+            store = Store(self.linker.engine)
 
-        try:
-            start(store)  # type: ignore
-        except Exception:
-            with open(err_log) as f:
-                raise WASMExecError(f.read())
+            if self.use_fuel:
+                store.add_fuel(self.fuel)
+            store.set_wasi(self.config)
+            instance = self.linker.instantiate(store, self.python_module)
 
-        with open(out_log) as f:
-            result = f.read()
+            start = instance.exports(store)["_start"]
+            mem = instance.exports(store)["memory"]
 
-        if not use_fuel:
-            fuel_consumed = None
-        else:
-            fuel_consumed = store.fuel_consumed()
+            try:
+                start(store)
+            except Exception:
+                with open(err_log) as f:
+                    raise WasmExecError(f.read())
 
-        return Result(
-            result, mem.size(store), mem.data_len(store), fuel_consumed  # type: ignore
-        )
+            with open(out_log) as f:
+                result = f.read()
 
+            if not self.use_fuel:
+                fuel_consumed = None
+            else:
+                fuel_consumed = store.fuel_consumed()
 
-# sys.modules[__name__] = wasm_exec
+            return Result(result, mem.size(store), mem.data_len(store), fuel_consumed)

@@ -11,10 +11,11 @@ Wasm-powered, sandboxed implementation of `exec()` for safely running dynamic Py
 
 ## Usage
 ```
-from wasm_exec import wasm_exec
+from wasm_exec import WasmExecutor
 
+wasm = WasmExecutor()
 code = "print('Hello World!')"
-print(wasm_exec(code).text)
+print(wasm.exec(code).text)
 
 >> Hello World!
 ```
