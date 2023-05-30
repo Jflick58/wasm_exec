@@ -2,7 +2,14 @@ import os
 import tempfile
 from textwrap import dedent
 
-from wasmtime import Config, Engine, Linker, Module, Store, WasiConfig  # type: ignore
+from wasmtime import (  # type: ignore
+    Config,
+    Engine,
+    Linker,
+    Module,
+    Store,
+    WasiConfig,
+)
 
 from .exceptions import WasmExecError
 from .schema import Result
@@ -50,7 +57,7 @@ class WasmExecutor:
         self.linker = Linker(Engine(self.engine_cfg))
         self.linker.define_wasi()
 
-        if not runtime_path :
+        if not runtime_path:
             runtime_path = os.path.abspath(
                 os.path.join(
                     os.path.dirname(__file__),
