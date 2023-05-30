@@ -50,7 +50,7 @@ class WasmExecutor:
         self.linker = Linker(Engine(self.engine_cfg))
         self.linker.define_wasi()
 
-        if runtime_path is None:
+        if not runtime_path :
             runtime_path = os.path.abspath(
                 os.path.join(
                     os.path.dirname(__file__),
