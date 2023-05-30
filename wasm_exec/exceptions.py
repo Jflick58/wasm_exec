@@ -1,0 +1,2 @@
+class WasmExecError(Exception):
+    pass
