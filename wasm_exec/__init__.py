@@ -2,6 +2,8 @@ import os
 import tempfile
 from textwrap import dedent
 
+from typing import Optional, List
+
 from wasmtime import (  # type: ignore
     Config,
     Engine,
@@ -9,41 +11,27 @@ from wasmtime import (  # type: ignore
     Module,
     Store,
     WasiConfig,
+    ValType,
+    GlobalType,
+    Global,
+    Val
 )
 
-from .exceptions import WasmExecError
-from .schema import Result
+# from .exceptions import WasmExecError
+# from .schema import Result
+
+class Result:
+    def __init__(self, result, mem_size, data_len, consumed):
+        self.text = result.strip()
+        self.mem_size = mem_size
+        self.data_len = data_len
+        self.fuel_consumed = consumed
+
+class WasmExecError(Exception):
+    pass
 
 
 class WasmExecutor:
-    """
-    Execute Python code strings using the VMWare Wasm Labs WebAssembly
-    Python runtime.
-
-    This is done by using wasmtime to run Python code in a seperate
-    WASM-based interpreter. The wasmtime code is sandboxed using chroot
-    for added security.
-
-    Fuel in wasmtime is a mechanism that allows limiting the number of instructions
-    executed during WebAssembly code execution. It helps prevent infinite loops or
-    excessive computations by setting a maximum amount of fuel that can be consumed.
-    Each instruction executed consumes a certain amount of fuel. Once the consumed
-    fuel reaches the specified limit, execution is halted. The consume_fuel option
-    and fuel parameter in the wasm_exec function enable this feature. The Result
-    object includes the fuel_consumed attribute, indicating how much fuel was consumed
-    during execution.
-
-    Credit to: https://til.simonwillison.net/webassembly/python-in-a-wasm-sandbox
-    for the reference implementation.
-
-    :param use_fuel: Whether to limit the execution by fuel consumption (optional).
-    :type use_fuel: bool
-    :param fuel: The maximum amount of fuel allowed for execution (optional).
-    :type fuel: int
-    :param runtime_path: Path to a Wasm runtime (optional)
-    :type runtime_path: str
-    """
-
     def __init__(
         self,
         use_fuel: bool = False,
@@ -74,7 +62,52 @@ class WasmExecutor:
         self.use_fuel = use_fuel
         self.fuel = fuel
 
-    def exec(self, code):
+    @staticmethod
+    def set_wasm_globals(store:Store, linker:Linker, variables={}) -> Store:
+
+        # Iterate over the Python global variables
+        for name, value in variables.items():
+
+            # Check if the value is of a supported type
+            if isinstance(value, (int, float)):
+                # Determine the Wasmtime type based on the Python type
+                if isinstance(value, int):
+                    value_type = ValType.i32()
+                elif isinstance(value, float):
+                    value_type = ValType.f64()
+
+                # Create a mutable global instance with the Python value
+                global_type = GlobalType(value_type, mutable=True)
+                global_var = Global(store, global_type, value)
+
+            elif callable(value):
+                # Create a function reference type for funcref
+                funcref_type = ValType.funcref()
+
+                # Create a function reference instance
+                func_ref = Val.funcref(value)
+
+                # Create a mutable global instance with the function reference
+                global_type = GlobalType(funcref_type, mutable=True)
+                global_var = Global(store, global_type, func_ref)
+
+
+            else:
+                # Create a string reference type for externref
+                externref_type = ValType.externref()
+
+                # Create an extern reference instance with the string value
+                extern_ref = ExternRef(value)
+
+                # Create a mutable global instance with the extern reference
+                global_type = GlobalType(externref_type, mutable=True)
+                global_var = Global(store, global_type, extern_ref)
+
+            linker.define(store, "", name, global_var )
+
+        return store
+
+    def exec(self, code:str, globals: Optional[dict]={}, locals: Optional[dict]={}) -> str:
         """
         Execute code in an isolated Wasm-based Python interpreter
 
@@ -93,6 +126,7 @@ class WasmExecutor:
             self.config.stderr_file = err_log
 
             store = Store(self.linker.engine)
+            store = WasmExecutor.set_wasm_globals(store, {**globals, **locals})
 
             if self.use_fuel:
                 store.add_fuel(self.fuel)
@@ -101,6 +135,7 @@ class WasmExecutor:
 
             start = instance.exports(store)["_start"]
             mem = instance.exports(store)["memory"]
+            print(instance.exports(store).__dir__())
 
             try:
                 start(store)
