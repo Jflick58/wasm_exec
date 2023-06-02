@@ -74,17 +74,22 @@ class WasmExecutor:
         self.use_fuel = use_fuel
         self.fuel = fuel
 
-    def exec(self, code):
+    def exec(self, code: str, globals: dict = {}, locals: dict = {}):
         """
-        Execute code in an isolated Wasm-based Python interpreter
+        Execute arbitrary code in an isolated Wasm-based Python interpreter
 
         :param code: The WebAssembly code to execute.
         :type code: str
+        :param globals: Allowed global scope
+        :type global: dict
+        :param locals: Allowed local scope
+        :type locals: dict
         :return: The result of the code execution.
         :rtype: Result
         :raises WasmExecError: If an error occurs during code execution.
         """
-        self.config.argv = ("python", "-c", dedent(code))
+        exec_code = f'exec("""{dedent(code)}""", {globals}, {locals})'
+        self.config.argv = ("python", "-c", exec_code)
 
         with tempfile.TemporaryDirectory() as chroot:
             out_log = os.path.join(chroot, "out.log")
@@ -103,7 +108,7 @@ class WasmExecutor:
             mem = instance.exports(store)["memory"]
 
             try:
-                start(store)
+                start(store)  # type: ignore
             except Exception:
                 with open(err_log) as f:
                     raise WasmExecError(f.read())
@@ -116,4 +121,9 @@ class WasmExecutor:
             else:
                 fuel_consumed = store.fuel_consumed()
 
-            return Result(result, mem.size(store), mem.data_len(store), fuel_consumed)
+            return Result(
+                result,  # type: ignore
+                mem.size(store),  # type: ignore
+                mem.data_len(store),  # type: ignore
+                fuel_consumed,
+            )  # type: ignore
