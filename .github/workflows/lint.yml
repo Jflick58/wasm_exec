@@ -30,7 +30,7 @@ jobs:
           cache: poetry
       - name: Install dependencies
         run: |
-          poetry install --with lint
+          poetry install --only=main,lint
       - name: Analysing the code with our lint
         run: |
           make lint

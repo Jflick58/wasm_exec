@@ -33,10 +33,10 @@ jobs:
           install-command: |
               if [ "${{ matrix.test_type }}" == "core" ]; then
                 echo "Running core tests, installing dependencies with poetry..."
-                poetry install --with test
+                poetry install --only=main,test
               else
                 echo "Running extended tests, installing dependencies with poetry..."
-                poetry install -E extended_testing
+                poetry install --only=main,test --all-extras
               fi
       - name: Run ${{matrix.test_type}} tests
         run: |
