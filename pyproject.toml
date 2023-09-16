@@ -13,26 +13,20 @@ include = ["wasm_runtime/*"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+requests = { version = "^2.31.0", optional = true }
 wasmtime = "^9.0.0"
 
-[tool.poetry.group.test]
-optional = true
-
 [tool.poetry.group.test.dependencies]
-pytest = "^7.3.1"
-
-[tool.poetry.group.install_wasm]
-optional = true
-
-[tool.poetry.group.install_wasm.dependencies]
-requests = "^2.31.0"
+pytest = "^7.4.0"
 
 [tool.poetry.group.lint.dependencies]
-ruff = "^0.0.249"
-mypy = "^0.991"
-black = "^23.1.0"
+black = "^23.7.0"
+mypy = "^1.5.1"
+ruff = "^0.0.286"
 types-chardet = "^5.0.4.6"
 
+[tool.poetry.extras]
+install-wasm = ["requests"]
 
 [build-system]
 requires = ["poetry-core"]
