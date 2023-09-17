@@ -1,9 +1,6 @@
 name: lint
 
-on:
-  push:
-    branches: [main]
-  pull_request:
+on: [push, pull_request, workflow_dispatch]
 
 env:
   POETRY_VERSION: "1.4.2"
