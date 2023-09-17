@@ -21,7 +21,7 @@ jobs:
         uses: "./.github/actions/poetry_setup"
         with:
           python-version: ${{ matrix.python-version }}
-          poetry-version: "1.4.2"
+          poetry-version: "1.6.1"
           cache-key: ${{ matrix.test_type }}
           install-command: |
               if [ "${{ matrix.test_type }}" == "core" ]; then

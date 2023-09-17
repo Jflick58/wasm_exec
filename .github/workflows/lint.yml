@@ -3,7 +3,7 @@ name: lint
 on: [push, pull_request, workflow_dispatch]
 
 env:
-  POETRY_VERSION: "1.4.2"
+  POETRY_VERSION: "1.6.1"
 
 jobs:
   build:
