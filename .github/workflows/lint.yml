@@ -1,4 +1,4 @@
-name: lint
+name: Lint
 
 on: [push, pull_request, workflow_dispatch]
 
@@ -6,7 +6,7 @@ env:
   POETRY_VERSION: "1.6.1"
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:

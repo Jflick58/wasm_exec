@@ -1,9 +1,9 @@
-name: test
+name: Test
 
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -20,7 +20,6 @@ jobs:
           - python-version: "3.12"
             experimental: true
     continue-on-error: ${{ matrix.experimental }}
-    name: Python ${{ matrix.python-version }} ${{ matrix.test_type }}
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
