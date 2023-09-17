@@ -11,6 +11,11 @@ inputs:
     description: Python version, supporting MAJOR.MINOR only
     required: true
 
+  python-allow-prereleases:
+    description: Whether to setup-python may install a prerelease of Python
+    required: false
+    default: false
+
   poetry-version:
     description: Poetry version
     required: true
@@ -36,6 +41,7 @@ runs:
       name: Setup python $${ inputs.python-version }}
       with:
         python-version: ${{ inputs.python-version }}
+        allow-prereleases: ${{ inputs.python-allow-prereleases }}
 
     - uses: actions/cache@v3
       id: cache-pip
