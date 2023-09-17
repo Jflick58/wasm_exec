@@ -16,7 +16,7 @@ jobs:
           - "3.10"
           - "3.11"
           - "3.12"
-        test_type:
+        test-type:
           - core
         include:
           - experimental: false
@@ -32,18 +32,18 @@ jobs:
           python-version: ${{ matrix.python-version }}
           python-allow-prereleases: ${{ matrix.experimental }}
           poetry-version: "1.6.1"
-          cache-key: ${{ matrix.test_type }}
+          cache-key: ${{ matrix.test-type }}
           install-command: |
-              if [ "${{ matrix.test_type }}" == "core" ]; then
+              if [ "${{ matrix.test-type }}" == "core" ]; then
                 echo "Running core tests, installing dependencies with poetry..."
                 poetry install --only=main,test
               else
                 echo "Running extended tests, installing dependencies with poetry..."
                 poetry install --only=main,test --all-extras
               fi
-      - name: Run ${{matrix.test_type}} tests
+      - name: Run ${{matrix.test-type}} tests
         run: |
-          if [ "${{ matrix.test_type }}" == "core" ]; then
+          if [ "${{ matrix.test-type }}" == "core" ]; then
             make test
           else
             make extended_tests
