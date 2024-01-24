@@ -1,46 +1,49 @@
-name: test
+name: Test
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-  workflow_dispatch:
-
-env:
-  POETRY_VERSION: "1.4.2"
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
     strategy:
       matrix:
+        os:
+          - ubuntu
+          - macos
+          - windows
         python-version:
           - "3.8"
           - "3.9"
           - "3.10"
           - "3.11"
-        test_type:
-          - "core"
-    name: Python ${{ matrix.python-version }} ${{ matrix.test_type }}
+          - "3.12"
+        test-type:
+          - core
+        include:
+          - experimental: false
+          - python-version: "3.12"
+            experimental: true
+    continue-on-error: ${{ matrix.experimental }}
+    runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
         uses: "./.github/actions/poetry_setup"
         with:
           python-version: ${{ matrix.python-version }}
-          poetry-version: "1.4.2"
-          cache-key: ${{ matrix.test_type }}
+          python-allow-prereleases: ${{ matrix.experimental }}
+          poetry-version: "1.6.1"
+          cache-key: ${{ matrix.test-type }}
           install-command: |
-              if [ "${{ matrix.test_type }}" == "core" ]; then
+              if [ "${{ matrix.test-type }}" == "core" ]; then
                 echo "Running core tests, installing dependencies with poetry..."
                 poetry install --only=main,test
               else
                 echo "Running extended tests, installing dependencies with poetry..."
                 poetry install --only=main,test --all-extras
               fi
-      - name: Run ${{matrix.test_type}} tests
+      - name: Run ${{matrix.test-type}} tests
         run: |
-          if [ "${{ matrix.test_type }}" == "core" ]; then
+          if [ "${{ matrix.test-type }}" == "core" ]; then
             make test
           else
             make extended_tests

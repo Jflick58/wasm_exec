@@ -11,6 +11,11 @@ inputs:
     description: Python version, supporting MAJOR.MINOR only
     required: true
 
+  python-allow-prereleases:
+    description: Whether to setup-python may install a prerelease of Python
+    required: false
+    default: false
+
   poetry-version:
     description: Poetry version
     required: true
@@ -36,6 +41,7 @@ runs:
       name: Setup python $${ inputs.python-version }}
       with:
         python-version: ${{ inputs.python-version }}
+        allow-prereleases: ${{ inputs.python-allow-prereleases }}
 
     - uses: actions/cache@v3
       id: cache-pip
@@ -47,8 +53,20 @@ runs:
           ~/.cache/pip
         key: pip-${{ runner.os }}-${{ runner.arch }}-py-${{ inputs.python-version }}
 
-    - run: pipx install poetry==${{ inputs.poetry-version }} --python python${{ inputs.python-version }}
+    - name: Update PyPI packages
       shell: bash
+      run: |
+        python -m pip install -U pip wheel
+
+        # Python prior to 3.12 ships setuptools. Upgrade it if present.
+        if pip freeze --all | grep -q '^setuptools=='; then
+            python -m pip install -U setuptools
+        fi
+
+    - name: Install Poetry
+      shell: bash
+      run: |
+        pip install poetry==${{ inputs.poetry-version }}
 
     - name: Check Poetry File
       shell: bash
